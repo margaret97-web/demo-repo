@@ -6,19 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                script {
-                    def branchName = env.BRANCH_NAME
-                    echo "Running on branch: ${branchName}"
-
-                    if (!(branchName == 'main' || branchName.contains('feature'))) {
-                        error("Pipeline failed: Branch not allowed.")
-                    }
-                }
-            }
-        }
-
         stage('Build') {
             steps {
                 sh './gradlew clean build'
@@ -27,20 +14,8 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                script {
-                    if (env.BRANCH_NAME == 'main') {
-                        sh './gradlew test codeCoverageReport' // Runs all tests + CodeCoverage
-                    } else if (env.BRANCH_NAME.contains('feature')) {
-                        sh './gradlew test' // Runs tests without CodeCoverage
-                    }
-                }
+                sh './gradlew test'
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline Execution Finished'
         }
     }
 }
